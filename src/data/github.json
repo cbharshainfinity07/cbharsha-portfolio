@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Vaani-Voice-Rag",
+    "owner": "cbharshainfinity07",
+    "description": "Vaani — a secure multilingual voice-enabled RAG system for MSMARCO-XI, with Sarvam speech-to-text, Qdrant retrieval, Ollama Cloud answer generation, citations, guardrails, and cloud deployment support.",
+    "url": "https://github.com/cbharshainfinity07/Vaani-Voice-Rag",
+    "homepage": "https://vaani-voice-rag.vercel.app",
+    "stars": 0,
+    "forks": 0,
+    "language": "HTML",
+    "languages": [
+      {
+        "name": "HTML",
+        "share": 52
+      },
+      {
+        "name": "Python",
+        "share": 48
+      },
+      {
+        "name": "Dockerfile",
+        "share": 0
+      },
+      {
+        "name": "JavaScript",
+        "share": 0
+      }
+    ],
+    "topics": [],
+    "created": "2026-08-13T12:56:20Z",
+    "pushed": "2026-08-21T13:45:45Z",
+    "score": 11.2
+  },
+  {
+    "name": "Clover-agency",
+    "owner": "cbharshainfinity07",
+    "description": "Clover — Independent digital studio. Websites, apps, automations, and WhatsApp systems for teams that want to lead the category.",
+    "url": "https://github.com/cbharshainfinity07/Clover-agency",
+    "homepage": "https://cloveragency.vercel.app",
+    "stars": 0,
+    "forks": 0,
+    "language": "HTML",
+    "languages": [
+      {
+        "name": "HTML",
+        "share": 100
+      }
+    ],
+    "topics": [],
+    "created": "2026-08-17T09:11:27Z",
+    "pushed": "2026-08-18T07:03:25Z",
+    "score": 10.5
+  },
+  {
+    "name": "Getchasma",
+    "owner": "cbharshainfinity07",
+    "description": "👓 Next-gen luxury optical e-commerce platform with an interactive 3D eyewear studio, real-time lens simulator, automated order fulfillment, smart returns, and executive admin analytics.",
+    "url": "https://github.com/cbharshainfinity07/Getchasma",
+    "homepage": "",
+    "stars": 0,
+    "forks": 0,
+    "language": "JavaScript",
+    "languages": [
+      {
+        "name": "JavaScript",
+        "share": 99
+      },
+      {
+        "name": "HTML",
+        "share": 0
+      },
+      {
+        "name": "CSS",
+        "share": 0
+      }
+    ],
+    "topics": [],
+    "created": "2026-09-14T02:36:22Z",
+    "pushed": "2026-09-20T06:43:17Z",
+    "score": 9
+  },
+  {
+    "name": "sentient-os-clone",
+    "owner": "cbharshainfinity07",
+    "description": "A high-fidelity Sentient OS clone featuring realistic 3D MacBook physics, real-time synaptic neural network canvas, dynamic island notch, and responsive dark/light UI.",
+    "url": "https://github.com/cbharshainfinity07/sentient-os-clone",
+    "homepage": "",
+    "stars": 0,
+    "forks": 0,
+    "language": "TypeScript",
+    "languages": [
+      {
+        "name": "TypeScript",
+        "share": 96
+      },
+      {
+        "name": "CSS",
+        "share": 3
+      },
+      {
+        "name": "HTML",
+        "share": 1
+      }
+    ],
+    "topics": [],
+    "created": "2026-09-08T07:22:57Z",
+    "pushed": "2026-09-08T07:26:25Z",
+    "score": 9
+  }
+]
