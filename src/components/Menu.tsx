@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
-import { ArrowUpRight, CaretDown, Envelope, FileText, GithubLogo, LinkedinLogo, MagnifyingGlass, XLogo } from '@phosphor-icons/react'
+import { ArrowRight, ArrowUpRight, CaretDown, Check, Copy, Envelope, FileText, GithubLogo, LinkedinLogo, MagnifyingGlass, XLogo } from '@phosphor-icons/react'
 import { profile, rankedProjects as projects } from '../content'
 import { lenis, onFlight, scrollToTarget } from '../lib/flight'
 import { CodeforcesIcon, LeetCodeIcon } from './BrandIcons'
@@ -14,86 +14,199 @@ const ORDER: MenuKey[] = ['work', 'connect']
 export const openProject = (slug: string) => window.dispatchEvent(new CustomEvent('open-project', { detail: slug }))
 
 /* ---------- dropdown contents ---------- */
+const GRADE = 'saturate(0.88) contrast(1.05)'
+
+/*
+  Work mega menu: project list on the left, a live preview on the right.
+  Hovering a project crossfades its real screenshot in, with a one-line story, stack and actions.
+*/
 function WorkPanel({ close }: { close: () => void }) {
+  const [active, setActive] = useState(0)
+  const p = projects[active]
   return (
-    <div className="w-[540px] p-2">
-      <div className="grid grid-cols-2 gap-1">
-        {projects.map((p) => (
+    <div className="grid w-[780px] grid-cols-[290px_1fr] gap-2 p-2">
+      <div className="flex flex-col">
+        <p className="t-mono flex items-center justify-between px-3 pb-2 pt-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+          Selected work <span>{String(projects.length).padStart(2, '0')}</span>
+        </p>
+        <LayoutGroup id="work-menu">
+          {projects.map((pr, i) => (
+            <button
+              key={pr.slug}
+              onPointerEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => {
+                close()
+                openProject(pr.slug)
+              }}
+              className="relative flex items-center gap-3 rounded-2xl p-2.5 text-left"
+            >
+              {active === i && (
+                <motion.span layoutId="work-active" className="absolute inset-0 rounded-2xl border border-white/[0.08] bg-white/[0.06]" transition={SPRING}>
+                  <span className="absolute left-0 top-1/2 h-6 w-[2px] -translate-y-1/2 rounded-full bg-accent" />
+                </motion.span>
+              )}
+              <span className="relative">
+                <ProjectMark name={pr.slug} size={40} active={active === i} />
+              </span>
+              <span className="relative min-w-0">
+                <span className={`block truncate text-[15px] font-medium transition-colors ${active === i ? 'text-ink' : 'text-ink-muted'}`}>{pr.title}</span>
+                <span className="t-mono block truncate text-ink-faint">{pr.kind}</span>
+              </span>
+            </button>
+          ))}
+        </LayoutGroup>
+        <div className="mt-auto flex items-center justify-between px-3 pb-1 pt-4">
           <button
-            key={p.slug}
             onClick={() => {
               close()
-              openProject(p.slug)
+              scrollToTarget('#work')
             }}
-            className="group flex items-center gap-3 rounded-2xl p-2.5 text-left transition-colors duration-150 hover:bg-white/[0.06]"
+            className="group flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
           >
-            <ProjectMark name={p.slug} size={42} />
-            <span className="min-w-0">
-              <span className="block truncate text-[15px] font-medium text-ink transition-colors group-hover:text-accent">{p.title}</span>
-              <span className="t-mono block truncate text-ink-faint">{p.kind}</span>
-            </span>
+            All exposures <ArrowRight size={13} className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </button>
-        ))}
+          <a href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub profile" className="text-ink-faint transition-colors hover:text-accent">
+            <GithubLogo size={16} />
+          </a>
+        </div>
       </div>
-      <div className="mt-2 flex items-center justify-between rounded-2xl bg-white/[0.035] px-4 py-3">
-        <button
-          onClick={() => {
-            close()
-            scrollToTarget('#work')
-          }}
-          className="text-sm text-ink-muted transition-colors hover:text-ink"
-        >
-          All exposures
-        </button>
-        <a href={profile.github} target="_blank" rel="noreferrer" className="t-mono flex items-center gap-1.5 text-ink-faint transition-colors hover:text-accent">
-          <GithubLogo size={14} /> github.com/{profile.githubUser} <ArrowUpRight size={12} />
-        </a>
+
+      {/* live preview */}
+      <div className="relative overflow-hidden rounded-[1.25rem] border border-white/[0.07] bg-white/[0.03]">
+        <div className="relative aspect-[16/9] overflow-hidden">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.img
+              key={p.slug}
+              src={p.image}
+              alt={`${p.title} preview`}
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: p.imagePosition, filter: GRADE }}
+              initial={{ opacity: 0, scale: 1.06 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+            />
+          </AnimatePresence>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0d16] via-[#0b0d16]/10 to-transparent" />
+          <span className="t-mono absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] text-ink-muted backdrop-blur-md">{p.year}</span>
+        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={p.slug}
+            className="relative px-5 pb-5"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4, transition: { duration: 0.12 } }}
+            transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+          >
+            <p className="-mt-3 text-2xl leading-none tracking-[-0.03em] [font-variation-settings:'wght'_640,'wdth'_84,'opsz'_48]">{p.title}</p>
+            <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-ink-muted">{p.blurb}</p>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <span className="t-mono truncate text-ink-faint">{p.stack.slice(0, 3).join('  /  ')}</span>
+              <span className="flex shrink-0 gap-1.5">
+                {p.live && (
+                  <a
+                    href={p.live}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-8 items-center gap-1 rounded-full border border-white/12 px-3 text-xs text-ink transition-colors hover:border-white/30"
+                  >
+                    Live <ArrowUpRight size={12} />
+                  </a>
+                )}
+                <button
+                  onClick={() => {
+                    close()
+                    openProject(p.slug)
+                  }}
+                  className="flex h-8 items-center gap-1 rounded-full bg-accent px-3 text-xs font-semibold text-[#0b0b0b] transition-colors hover:bg-accent-soft"
+                >
+                  Open <ArrowRight size={12} weight="bold" />
+                </button>
+              </span>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   )
 }
 
+/*
+  Connect mega menu: profile tiles on the left, an availability card on the right with
+  one-click email copy and a direct "write to me".
+*/
 function ConnectPanel() {
-  const handle = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
-  const items: { label: string; sub: string; href: string; icon: ReactNode }[] = [
-    { label: 'Email', sub: profile.email, href: `mailto:${profile.email}`, icon: <Envelope size={18} /> },
-    { label: 'LinkedIn', sub: 'c-b-harshavardhan', href: profile.linkedin, icon: <LinkedinLogo size={18} /> },
-    { label: 'GitHub', sub: handle(profile.github), href: profile.github, icon: <GithubLogo size={18} /> },
-    { label: 'LeetCode', sub: 'u/cbharshainfinity07', href: profile.leetcode, icon: <LeetCodeIcon size={16} /> },
-    { label: 'Codeforces', sub: 'cbharshainfinity07', href: profile.codeforces, icon: <CodeforcesIcon size={16} /> },
-    { label: 'X', sub: '@cbhinfinity0202', href: profile.x, icon: <XLogo size={17} /> },
+  const [copied, setCopied] = useState(false)
+  const tiles: { label: string; sub: string; href: string; icon: ReactNode }[] = [
+    { label: 'LinkedIn', sub: 'c-b-harshavardhan', href: profile.linkedin, icon: <LinkedinLogo size={20} /> },
+    { label: 'GitHub', sub: profile.githubUser, href: profile.github, icon: <GithubLogo size={20} /> },
+    { label: 'LeetCode', sub: 'cbharshainfinity07', href: profile.leetcode, icon: <LeetCodeIcon size={18} /> },
+    { label: 'Codeforces', sub: 'cbharshainfinity07', href: profile.codeforces, icon: <CodeforcesIcon size={18} /> },
+    { label: 'X', sub: '@cbhinfinity0202', href: profile.x, icon: <XLogo size={19} /> },
+    { label: 'Resume', sub: 'PDF, 1 page', href: profile.resume, icon: <FileText size={20} /> },
   ]
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    } catch {
+      window.location.href = `mailto:${profile.email}`
+    }
+  }
   return (
-    <div className="w-[360px] p-2">
-      {items.map((it) => (
-        <a
-          key={it.label}
-          href={it.href}
-          target={it.href.startsWith('mailto') ? undefined : '_blank'}
-          rel="noreferrer"
-          className="group flex items-center gap-3 rounded-2xl p-2.5 transition-colors duration-150 hover:bg-white/[0.06]"
-        >
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-ink transition-colors group-hover:border-accent/40 group-hover:text-accent">
-            {it.icon}
+    <div className="grid w-[680px] grid-cols-[1fr_272px] gap-2 p-2">
+      <div className="grid grid-cols-2 gap-1.5">
+        {tiles.map((t) => (
+          <a
+            key={t.label}
+            href={t.href}
+            target="_blank"
+            rel="noreferrer"
+            className="group relative flex flex-col justify-between gap-6 overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.025] p-3.5 transition-[border-color,background-color] duration-200 hover:border-accent/35 hover:bg-accent/[0.05]"
+          >
+            <span className="flex items-start justify-between">
+              <span className="grid size-10 place-items-center rounded-xl bg-white/[0.06] text-ink transition-colors group-hover:text-accent">{t.icon}</span>
+              <ArrowUpRight size={14} className="text-ink-faint transition-[transform,color] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+            </span>
+            <span>
+              <span className="block text-[15px] font-medium text-ink">{t.label}</span>
+              <span className="t-mono block truncate text-ink-faint">{t.sub}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+
+      <div className="relative flex flex-col overflow-hidden rounded-[1.25rem] border border-accent/20 bg-[radial-gradient(120%_80%_at_100%_0%,rgb(233_180_92/0.16),transparent_60%),rgb(255_255_255/0.025)] p-5">
+        <span className="t-mono flex items-center gap-2 text-emerald-300/90">
+          <span className="relative flex size-2">
+            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/60" />
+            <span className="relative size-2 rounded-full bg-emerald-400" />
           </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[15px] font-medium text-ink">{it.label}</span>
-            <span className="t-mono block truncate text-ink-faint">{it.sub}</span>
-          </span>
-          <ArrowUpRight size={14} className="text-ink-faint opacity-0 transition-[opacity,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" />
-        </a>
-      ))}
-      <a
-        href={profile.resume}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-1 flex items-center justify-between rounded-2xl bg-accent px-4 py-3 text-sm font-semibold text-[#0b0b0b] transition-colors hover:bg-accent-soft"
-      >
-        <span className="flex items-center gap-2">
-          <FileText size={16} weight="bold" /> Download resume
+          Available now
         </span>
-        <span className="t-mono opacity-70">PDF</span>
-      </a>
+        <p className="mt-4 text-[1.6rem] leading-[1.05] tracking-[-0.03em] [font-variation-settings:'wght'_620,'wdth'_84,'opsz'_48]">
+          Open to SDE and AI internships.
+        </p>
+        <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">I reply within a day. Email is the fastest way in.</p>
+        <button
+          onClick={copy}
+          className="mt-auto flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 text-left transition-colors hover:border-white/25"
+        >
+          <span className="t-mono truncate text-ink">{copied ? 'Copied to clipboard' : profile.email}</span>
+          <span className={`grid size-7 shrink-0 place-items-center rounded-lg ${copied ? 'bg-accent text-[#0b0b0b]' : 'bg-white/10 text-ink'}`}>
+            {copied ? <Check size={14} weight="bold" /> : <Copy size={14} />}
+          </span>
+        </button>
+        <a
+          href={`mailto:${profile.email}`}
+          className="mt-2 flex h-10 items-center justify-center gap-2 rounded-xl bg-accent text-sm font-semibold text-[#0b0b0b] transition-colors hover:bg-accent-soft"
+        >
+          <Envelope size={15} weight="bold" /> Write to me
+        </a>
+      </div>
     </div>
   )
 }
@@ -113,6 +226,7 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
   const [hoverLink, setHoverLink] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
   const [panelX, setPanelX] = useState(0)
+  const [headerLeft, setHeaderLeft] = useState(0)
   const [size, setSize] = useState({ w: 0, h: 0 })
   const ring = useRef<SVGCircleElement>(null)
   const header = useRef<HTMLElement>(null)
@@ -170,12 +284,16 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
     const hb = header.current!.getBoundingClientRect()
     const tb = trigger.getBoundingClientRect()
     setPanelX(tb.left + tb.width / 2 - hb.left)
+    setHeaderLeft(hb.left)
     setMenu(key)
   }
   const hideSoon = () => {
     clearTimeout(closeTimer.current)
     closeTimer.current = window.setTimeout(() => setMenu(null), 160)
   }
+  // centre the panel under its trigger, but never let it leave the viewport
+  const panelLeft = Math.max(12 - headerLeft, Math.min(panelX - size.w / 2, (typeof window !== 'undefined' ? window.innerWidth : 1440) - headerLeft - size.w - 12))
+
   const go = (id: string) => {
     setOpen(false)
     setMenu(null)
@@ -296,8 +414,8 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
             <motion.div
               key="dropdown"
               className="absolute top-full pt-3"
-              initial={{ opacity: 0, y: -6, scale: 0.97, x: panelX - size.w / 2 }}
-              animate={{ opacity: 1, y: 0, scale: 1, x: panelX - size.w / 2 }}
+              initial={{ opacity: 0, y: -6, scale: 0.97, x: panelLeft }}
+              animate={{ opacity: 1, y: 0, scale: 1, x: panelLeft }}
               exit={{ opacity: 0, y: -6, scale: 0.97, transition: { duration: 0.15 } }}
               transition={SPRING}
               style={{ transformOrigin: 'top center' }}
@@ -305,7 +423,7 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
               onPointerLeave={hideSoon}
             >
               <motion.div
-                className="nav-glass nav-glass--solid relative overflow-hidden rounded-[1.6rem]"
+                className="menu-glass relative overflow-hidden rounded-[1.75rem]"
                 animate={{ width: size.w || 'auto', height: size.h || 'auto' }}
                 transition={SPRING}
               >

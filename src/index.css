@@ -217,3 +217,27 @@ p { text-wrap: pretty; }
 @media (prefers-reduced-transparency: reduce) {
   .cmd-glass { background: #0a0c14; backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
+
+/* Mega-menu surface: near-opaque frosted glass so nothing behind bleeds through, gold edge glow */
+.menu-glass {
+  background:
+    radial-gradient(80% 50% at 50% 0%, rgb(233 180 92 / 0.07), transparent 70%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.01)),
+    rgb(9 11 19 / 0.93);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    0 40px 100px -30px rgb(0 0 0 / 0.9),
+    0 0 0 1px rgb(0 0 0 / 0.5);
+}
+.menu-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0 12% auto;
+  height: 1px;
+  z-index: 1;
+  background: linear-gradient(90deg, transparent, rgb(233 180 92 / 0.7), transparent);
+  pointer-events: none;
+}
