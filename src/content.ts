@@ -218,6 +218,7 @@ export const skills = [
 // Section copy, in one place so the voice stays consistent.
 export const copy = {
   hint: 'Move through the name. Click to scatter it.',
+  hintTouch: 'Drag through the name. Tap to scatter it.',
   work: { title: 'Exposures.', sub: 'Things I shipped', note: 'Hover to preview. Click to open the full story.' },
   skills: {
     title: 'Instruments.',

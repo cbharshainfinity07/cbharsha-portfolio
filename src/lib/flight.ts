@@ -16,6 +16,8 @@ export const flight = {
   velocity: 0, // smoothed scroll velocity, px per frame
   pointer: { x: 0, y: 0 },
   reduced: false,
+  nameBottom: -1, // px from the viewport top to the lower edge of the particle name in the hero pose (-1 until known)
+  pointerActive: false, // a real pointer is over the page: a mouse, or a finger while it drags
 }
 
 type Listener = () => void
@@ -65,6 +67,8 @@ export function startFlight() {
   if (!flight.reduced) {
     lenis = new Lenis({ autoRaf: false, lerp: 0.085 })
     lenis.on('scroll', ScrollTrigger.update)
+    // dev only: lets the video recorder and the device audit drive scrolls and read scene state
+    if (import.meta.env.DEV) Object.assign(window, { __lenis: lenis, __flight: flight })
   }
   const raf = (time: number) => lenis?.raf(time * 1000)
   gsap.ticker.add(raf)
@@ -87,8 +91,17 @@ export function startFlight() {
   const onPointer = (e: PointerEvent) => {
     flight.pointer.x = (e.clientX / window.innerWidth) * 2 - 1
     flight.pointer.y = (e.clientY / window.innerHeight) * 2 - 1
+    flight.pointerActive = true
   }
+  // touch has no hover: the effect follows a finger only while it is down, a mouse until it leaves the window
+  const onPointerEnd = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse') flight.pointerActive = false
+  }
+  const onLeave = () => void (flight.pointerActive = false)
   window.addEventListener('pointermove', onPointer, { passive: true })
+  window.addEventListener('pointerup', onPointerEnd, { passive: true })
+  window.addEventListener('pointercancel', onPointerEnd, { passive: true })
+  document.documentElement.addEventListener('pointerleave', onLeave)
 
   const tick = () => {
     const y = lenis ? lenis.scroll : window.scrollY
@@ -105,6 +118,9 @@ export function startFlight() {
     gsap.ticker.remove(tick)
     ScrollTrigger.removeEventListener('refresh', measure)
     window.removeEventListener('pointermove', onPointer)
+    window.removeEventListener('pointerup', onPointerEnd)
+    window.removeEventListener('pointercancel', onPointerEnd)
+    document.documentElement.removeEventListener('pointerleave', onLeave)
     ro.disconnect()
     lenis?.destroy()
     lenis = null

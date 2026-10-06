@@ -376,11 +376,11 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
               onClick={onPalette}
               onPointerEnter={hideSoon}
               aria-label="Search and jump (command menu)"
-              className="flex h-10 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] pl-3 pr-1.5 text-sm text-ink-faint transition-colors duration-150 hover:border-white/20 hover:text-ink"
+              className="flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 text-sm sm:pr-1.5 md:h-10 text-ink-faint transition-colors duration-150 hover:border-white/20 hover:text-ink"
             >
               <MagnifyingGlass size={15} />
               <span className="hidden lg:inline">Search</span>
-              <kbd className="t-mono hidden rounded-md border border-white/10 bg-white/[0.05] px-1.5 py-0.5 text-[10px] text-ink-muted sm:inline">
+              <kbd className="t-mono hidden rounded-md border border-white/10 bg-white/[0.05] px-1.5 py-0.5 text-[10px] text-ink-muted sm:inline [@media(pointer:coarse)]:hidden">
                 {isMac ? '⌘' : 'Ctrl'} K
               </kbd>
             </button>
@@ -400,7 +400,7 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
               aria-expanded={open}
               aria-controls="menu-overlay"
               aria-label={open ? 'Close menu' : 'Open menu'}
-              className="relative grid size-10 place-items-center rounded-full bg-white/[0.06] hover:bg-white/10 md:hidden"
+              className="relative grid size-11 place-items-center rounded-full bg-white/[0.06] hover:bg-white/10 md:hidden"
             >
               <span className={`absolute h-px w-[16px] bg-ink transition-transform duration-500 ease-fluid ${open ? 'rotate-45' : '-translate-y-[3.5px]'}`} />
               <span className={`absolute h-px w-[16px] bg-ink transition-transform duration-500 ease-fluid ${open ? '-rotate-45' : 'translate-y-[3.5px]'}`} />
@@ -472,7 +472,7 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
           ))}
         </ul>
         <div
-          className={`t-mono mt-12 flex flex-wrap gap-x-8 gap-y-3 text-ink-muted transition-opacity duration-700 ease-fluid ${open ? 'opacity-100' : 'opacity-0'}`}
+          className={`t-mono mt-10 flex flex-wrap gap-x-7 text-ink-muted transition-opacity duration-700 ease-fluid ${open ? 'opacity-100' : 'opacity-0'}`}
           style={{ transitionDelay: open ? '320ms' : '0ms' }}
         >
           {[
@@ -484,7 +484,7 @@ export function Menu({ onPalette }: { onPalette: () => void }) {
             ['X', profile.x],
             ['Resume', profile.resume],
           ].map(([label, href]) => (
-            <a key={label} href={href} tabIndex={open ? 0 : -1} className="hover:text-accent">
+            <a key={label} href={href} tabIndex={open ? 0 : -1} className="inline-block py-3 hover:text-accent">
               {label}
             </a>
           ))}

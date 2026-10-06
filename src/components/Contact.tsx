@@ -55,7 +55,8 @@ export function Contact() {
   return (
     <section id="contact" className="relative flex min-h-[100dvh] flex-col">
       <div className="relative mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-5 py-32 md:px-10">
-        <div className="pointer-events-none absolute inset-y-0 -left-10 w-[75%] bg-[radial-gradient(ellipse_at_left,rgb(3_4_9/0.8),transparent_65%)]" aria-hidden />
+        {/* desktop: the hole sits to the right, a soft wash on the left is enough; portrait: it sits right behind the copy */}
+        <div className="pointer-events-none absolute inset-y-0 -left-10 w-[75%] bg-[radial-gradient(ellipse_at_left,rgb(3_4_9/0.8),transparent_65%)] max-lg:right-0 max-lg:w-auto max-lg:bg-[radial-gradient(ellipse_75%_40%_at_35%_50%,rgb(3_4_9/0.86),rgb(3_4_9/0.5)_55%,transparent_80%)]" aria-hidden />
         <SplitHeading className="t-display relative max-w-[12ch]" lines={[{ t: words.contact.title }, { t: words.contact.sub, muted: true }]} />
         <Rise text={words.contact.body} className="t-lead relative mt-8 max-w-[34ch] text-ink-muted" step={22} delay={300} />
         <div className="relative mt-10 flex flex-wrap items-center gap-3">
@@ -97,17 +98,17 @@ export function Contact() {
           </button>
         </div>
       </div>
-      <footer className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-5 py-8 md:flex-row md:items-center md:justify-between md:px-10">
+      <footer className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-5 py-8 md:px-10 lg:flex-row lg:items-center lg:justify-between">
         {/* each item sits on its own small frosted pill: legible over the disk, the hole stays visible around them */}
         <div className="footer-glass w-max rounded-full p-1.5">
           <Dock items={socials} />
         </div>
-        <p className="footer-glass t-mono max-w-full rounded-2xl px-4 py-2.5 text-ink-muted md:w-max md:rounded-full">
+        <p className="footer-glass t-mono max-w-full rounded-2xl px-4 py-2.5 text-ink-muted lg:w-max lg:rounded-full">
           © {new Date().getFullYear()} <span className="text-ink">{profile.fullName}</span>. {words.footer}
         </p>
         <button
           onClick={() => scrollToTarget(0)}
-          className="footer-glass group inline-flex w-max items-center gap-2 rounded-full py-2 pl-4 pr-2 text-sm text-ink hover:text-accent"
+          className="footer-glass group inline-flex w-max items-center gap-2 whitespace-nowrap rounded-full py-2 pl-4 pr-2 text-sm text-ink hover:text-accent"
         >
           Back to the top
           <span className="grid size-7 place-items-center rounded-full bg-white/10 transition-transform duration-500 ease-fluid group-hover:-translate-y-0.5">

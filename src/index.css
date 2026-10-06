@@ -38,8 +38,11 @@ html { scrollbar-width: thin; scrollbar-color: rgb(238 240 243 / 0.18) transpare
 /* Consistent depth on every image (better-ui): white hairline, never a tinted neutral */
 img { outline: 1px solid oklch(1 0 0 / 0.1); outline-offset: -1px; }
 
-/* Focus is always visible, always gold */
-:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 6px; }
+/* Focus is always visible, always gold. In the base layer so a component's own focus style (e.g. the
+   palette input) can override it; the outline follows each element's own radius, pills stay pills. */
+@layer base {
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+}
 
 /* Film grain on a fixed, non-interactive layer */
 .grain::after {

@@ -154,8 +154,16 @@ const GALAXY_EXTRA = 54000
 
 function NameGalaxy() {
   const mat = useRef<THREE.ShaderMaterial>(null!)
-  const { viewport, camera } = useThree()
+  const { viewport, camera, size } = useThree()
   const [points, setPoints] = useState<Float32Array | null>(null)
+  // lowest point of the sampled name, so the hero can sit its subtitle just under the real glyphs
+  const nameMinY = useMemo(() => {
+    if (!points) return 0
+    let m = Infinity
+    for (let i = 1; i < NAME_COUNT * 3; i += 3) m = Math.min(m, points[i])
+    return m
+  }, [points])
+  const anchor = useMemo(() => new THREE.Vector3(), [])
 
   useEffect(() => {
     let alive = true
@@ -239,6 +247,12 @@ function NameGalaxy() {
     u.uMorph.value = ss(s, 0.06, 0.26)
     u.uNameScale.value = Math.min(1.13, viewport.aspect / 1.15)
     u.uNameLift.value = viewport.aspect < 0.9 ? 4 : 2.2
+    // project the name's lower edge to screen space while the hero is on screen (any aspect ratio, any device);
+    // at the very top the stage already reads ~0.07 because it is measured at mid-viewport
+    if (points && s < 0.12) {
+      anchor.set(0, nameMinY * u.uNameScale.value + u.uNameLift.value, 0).project(camera)
+      flight.nameBottom = ((1 - anchor.y) / 2) * size.height
+    }
     u.uPixel.value = gl.getPixelRatio()
     // step the galaxy back while the project list is on screen so the type stays crisp
     const workDim = ss(s, 0.3, 0.38) * (1 - ss(s, 0.55, 0.62))
@@ -248,7 +262,8 @@ function NameGalaxy() {
     ray.setFromCamera(ndc, camera)
     ray.ray.intersectPlane(plane, world.mouse)
     u.uMouse.value.lerp(world.mouse, 0.2)
-    world.mouseOn += ((flight.reduced ? 0 : 1) - world.mouseOn) * 0.05
+    // no pointer yet (or a touch device between drags): the name stays whole instead of being pushed from screen centre
+    world.mouseOn += ((flight.reduced || !flight.pointerActive ? 0 : 1) - world.mouseOn) * 0.05
     u.uMouseOn.value = world.mouseOn
     world.burst *= 0.94
     u.uBurst.value = world.burst
